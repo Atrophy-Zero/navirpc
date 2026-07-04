@@ -9,7 +9,7 @@ type Desired struct {
 // a same-track tick whose Start moves less than this is drift, not a seek.
 const seekToleranceMs = 3000
 
-// desired-state for one user; records what presence should be and defers the debounced
+// desired-state for one user. records what presence should be and defers the debounced
 // clear to Due. never does i/o.
 type UserState struct {
 	seq            int64
@@ -28,7 +28,7 @@ func (s *UserState) OnReport(state string, act Activity, nowMs int64) (Desired, 
 	case "playing", "starting":
 		return s.emit("play", act)
 	case "paused", "stopped", "expired":
-		// hide the card: pause clears like a stop. arm a clear; a new play before the
+		// hide the card, pause clears like a stop. arm a clear, a new play before the
 		// deadline cancels it, otherwise Due emits it. forget the last activity so a later
 		// play re-emits even for the same track.
 		s.pendingClearAt = nowMs + s.debounceMs
