@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/navidrome/navidrome/refs/heads/master/plugins/manifest-schema.json",
+  "name": "navirpc",
+  "author": "rxtted",
+  "version": "0.0.1",
+  "description": "discord rich presence from navidrome",
+  "permissions": {
+    "users": { "reason": "to set presence on behalf of navidrome users" }
+  },
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "title": "User bindings",
+          "description": "one entry per navidrome user that should broadcast presence",
+          "items": {
+            "type": "object",
+            "properties": {
+              "username": { "type": "string", "title": "Navidrome username" },
+              "token": { "type": "string", "title": "Config value from the connect page" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
