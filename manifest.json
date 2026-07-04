@@ -3,9 +3,9 @@
   "name": "navirpc",
   "author": "rxtted",
   "version": "0.0.1",
-  "description": "discord rich presence from navidrome",
+  "description": "Discord rich presence from Navidrome",
   "permissions": {
-    "users": { "reason": "to set presence on behalf of navidrome users" }
+    "users": { "reason": "To set presence on behalf of Navidrome users" }
   },
   "config": {
     "schema": {
@@ -14,7 +14,7 @@
         "users": {
           "type": "array",
           "title": "User bindings",
-          "description": "one entry per navidrome user that should broadcast presence",
+          "description": "One entry per Navidrome user that should broadcast presence",
           "items": {
             "type": "object",
             "properties": {
