@@ -28,10 +28,9 @@ func (s *UserState) OnReport(state string, act Activity, nowMs int64) (Desired, 
 	case "playing", "starting":
 		return s.emit("play", act)
 	case "paused", "stopped", "expired":
-		// hide the card. a music client pauses far more than it stops, so pause is the
-		// real "not listening" signal and clears like a stop. arm a clear; a new play
-		// before the deadline cancels it, otherwise Due emits it. forget the last activity
-		// so a later play re-emits even for the same track.
+		// hide the card: pause clears like a stop. arm a clear; a new play before the
+		// deadline cancels it, otherwise Due emits it. forget the last activity so a later
+		// play re-emits even for the same track.
 		s.pendingClearAt = nowMs + s.debounceMs
 		s.lastKind, s.lastAct = "", Activity{}
 		return Desired{}, false

@@ -68,10 +68,12 @@ func (plugin) OnInit() error {
 			cur = &s
 		}
 		next := auth.Reconcile(seed, clientID, "", cur)
-		// write only on a real seed change, so a reload can't clobber a token the report
-		// path just rotated on the other goroutine
-		if cur == nil || cur.Seed != seed {
-			store.Save(u.Username, *next)
+		// write only on a real config change (seed or client_id), so a reload can't clobber
+		// a token the report path just rotated on the other goroutine
+		if cur == nil || cur.Seed != seed || cur.ClientID != clientID {
+			if err := store.Save(u.Username, *next); err != nil {
+				pdk.Log(pdk.LogWarn, "navirpc: could not persist token for "+u.Username+": "+err.Error())
+			}
 		}
 		clearState(u.Username) // drop stale playback/presence so the first report starts fresh
 	}
@@ -138,8 +140,12 @@ func (plugin) OnCallback(scheduler.SchedulerCallbackRequest) error {
 		if !ok || s.Dead || auth.NeedsRefresh(s, nowUnix) {
 			continue // no usable access token; the report path refreshes on the next action
 		}
+		ps := loadPresence(u.Username)
+		if ps.SessionToken == "" {
+			continue // no established session to keep alive; only the report path creates one
+		}
 		desired := presence.Desired{Seq: snap.Seq, Kind: snap.LastKind, Act: snap.LastAct}
-		ps, err := presence.Reconcile(u.Username, desired, loadPresence(u.Username), discordPublisher{}, nowMs)
+		ps, err := presence.Reconcile(u.Username, desired, ps, discordPublisher{}, nowMs)
 		if err != nil {
 			pdk.Log(pdk.LogWarn, "navirpc: tick for "+u.Username+" failed: "+err.Error())
 		}
