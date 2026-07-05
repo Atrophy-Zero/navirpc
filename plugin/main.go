@@ -78,7 +78,7 @@ func (plugin) OnInit() error {
 		if s, ok := store.Load(u.Username); ok {
 			cur = &s
 		}
-		next := auth.Reconcile(seed, clientID, "", cur)
+		next := auth.Reconcile(seed, clientID, cur)
 		// write only on a real config change of seed or client_id, so a reload can't clobber
 		// a token the report path just rotated on the other goroutine
 		if cur == nil || cur.Seed != seed || cur.ClientID != clientID {
