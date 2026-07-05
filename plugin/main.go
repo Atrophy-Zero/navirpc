@@ -69,10 +69,10 @@ func findUser(username string) (userConfig, bool) {
 func (plugin) OnInit() error {
 	store := kvStore{}
 	for _, u := range readUsers() {
-		// an own-app token carries its own client_id and wins, else the instance default
+		// an own-app token carries its own client_id and wins, else the central app
 		seed, clientID := authFrom(u.Token)
 		if clientID == "" {
-			clientID = configuredClientID()
+			clientID = centralClientID
 		}
 		var cur *auth.Stored
 		if s, ok := store.Load(u.Username); ok {
@@ -224,13 +224,6 @@ func (l look) prefs() presence.Prefs {
 		SmallText:         l.SmallText,
 		Buttons:           l.Buttons,
 	}
-}
-
-func configuredClientID() string {
-	if v, ok := pdk.GetConfig("client_id"); ok && v != "" {
-		return v
-	}
-	return centralClientID
 }
 
 // an absent or blank setting defaults to caa then itunes, an explicit empty list is no art.
