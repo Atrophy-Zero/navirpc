@@ -13,9 +13,11 @@ test:
 
 setup:
 	@# git has one hooks slot and whoever writes it last wins, ask who is here
-	@# rather than grabbing it
-	@if command -v vox-engine >/dev/null 2>&1; then \
+	@# rather than grabbing it. probe the path the hooks resolve, never PATH,
+	@# which needs a login profile containers dont run
+	@if [ -x "$$HOME/.local/bin/vox-engine" ]; then \
 		git config vox.projectHooks .githooks; \
+		git config vox.enabled true; \
 		if [ "$$(git config --local --get core.hooksPath)" = ".githooks" ]; then \
 			git config --unset core.hooksPath; \
 		fi; \
