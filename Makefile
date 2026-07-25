@@ -14,14 +14,18 @@ test:
 setup:
 	@# git has one hooks slot and whoever writes it last wins, ask who is here
 	@# rather than grabbing it. probe the path the hooks resolve, never PATH,
-	@# which needs a login profile containers dont run
+	@# which needs a login profile containers dont run. an enrolled repo with
+	@# no binary is a wiring fault, so that case fails rather than shadowing
 	@if [ -x "$$HOME/.local/bin/vox-engine" ]; then \
 		git config vox.projectHooks .githooks; \
-		git config vox.enabled true; \
+		git config --local --get vox.enabled >/dev/null || git config vox.enabled true; \
 		if [ "$$(git config --local --get core.hooksPath)" = ".githooks" ]; then \
 			git config --unset core.hooksPath; \
 		fi; \
 	else \
+		if git config --local --get vox.enabled >/dev/null; then \
+			echo "this repo is enrolled and the vox binary is missing, fix the wiring, not the hook slot"; exit 1; \
+		fi; \
 		git config core.hooksPath .githooks; \
 	fi
 
